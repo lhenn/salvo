@@ -1,0 +1,231 @@
+/* Browser reset */
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed,
+figure, figcaption, footer, header, hgroup,
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+  margin: 0;
+  padding: 0;
+  border: 0;
+  font-size: 100%;
+  font: inherit;
+  vertical-align: baseline;
+}
+
+body{
+  background-size: 30px 30px;
+    background-image: linear-gradient(to right, #494949 1px, transparent 1px), linear-gradient(to bottom, #494949 1px, transparent 1px);
+    background-color: #333333;
+    color:white;
+}
+h1{
+  font-family:"Impact";
+  font-size:150px;
+  color:#b20f03;
+}
+h2{
+  font-size:26px;
+  font-weight: 500;
+  padding-bottom:2%;
+}
+a{
+  color:#42f1f4;
+}
+button:focus, input:focus {
+  outline:0;
+}
+.yellow{
+  color:yellow;
+}
+.hidden{
+  display:none;
+}
+.displayed{
+  display:flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+.displayed .form-line{
+  padding:1% 2%;
+}
+.window-close{
+  font-size:28px;
+  background-color: inherit;
+  color:white;
+  border:none;
+}
+#app{
+  display:grid;
+  height:100vh;
+  grid-template-rows: 5% 25% 25% 40%;
+  grid-template-columns: 40% 60%;
+  font-family: "Courier New";
+}
+#register-container{
+  position:absolute;
+  height:60%;
+  width:35%;
+  margin-left: 3%;
+  margin-bottom: 3%;
+  left: 0;
+  bottom: 0;
+  background-color: #1f2733;
+}
+#register-wrapper{
+  height:80%;
+}
+#reg-head{
+  display: flex;
+  flex-flow:row-reverse;
+}
+#feedback-wrapper{
+  display:flex;
+  justify-content: center;
+}
+#sign-in-here{
+  background-color: inherit;
+  border:0;
+  color:yellow;
+  font-family: "Courier New";
+  font-size:
+
+}
+#logout-container{
+  grid-row: 1/2;
+  grid-column: 2/3;
+  display: flex;
+  flex-flow: row-reverse;
+}
+#logout-button {
+  background-color: inherit;
+  color:lightgrey;
+  font-family: "Courier New";
+  border:0;
+  margin:2%;
+  white-space:nowrap;
+  font-size:16px;
+}
+#logout-form button:hover{
+  font-weight: bold;
+}
+#header-container{
+  grid-row: 2/3;
+  grid-column: 1/2;
+  display:flex;
+  justify-content: center;
+  align-items: center;
+}
+#login-container{
+  grid-row:3/5;
+  grid-column:1/2;
+  display:flex;
+  flex-direction:column;
+  justify-content: center;
+  align-items: center;
+}
+#logged-in-container{
+  grid-row:3/5;
+  grid-column:1/2;
+  display:flex;
+  flex-direction:column;
+  justify-content: flex-start;
+  align-items: center;
+  margin-top:25%;
+  text-align: center;
+}
+#login-form{
+  display:flex;
+  flex-direction:column;
+  width:70%;
+}
+.form-line{
+  margin:3% 1%;
+  display:flex;
+  flex-direction:row;
+  justify-content: flex-start;
+  flex-wrap:nowrap;
+  white-space:nowrap;
+}
+#login-header{
+  font-weight: bold;
+  margin-bottom:5%;
+}
+label{
+  margin:1%;
+  flex-grow:2;
+}
+input[type='text']{
+  background-color: inherit;
+  font-family: "Courier New";
+  color:yellow;
+  font-size:16px;
+  flex-grow:1;
+  margin:
+}
+#register-btn,#submit-btn{
+  background-color: #295443;
+  font-family: "Courier New";
+  font-size:18px;
+  color:white;
+  padding:1%;
+  margin:1% 0;
+  width:40%;
+}
+#submit-btn-container{
+  display:flex;
+  justify-content: center;
+}
+.error-message{
+  color:red;
+  width:80%;
+  height:auto;
+  white-space:normal;
+}
+#reg-button,#sign-in-here{
+  font-family: "Courier New";
+  font-size:18px;
+  background-color: inherit;
+  border:0;
+  color:yellow;
+  text-decoration: underline;
+  margin:7% 0;
+}
+#reg-button:hover, #submit-btn:hover, #register-btn:hover{
+font-weight: bold;
+}
+#submit-btn:hover, #register-btn:hover{
+    border: 2px solid white;
+}
+#leaderboard-container{
+  grid-row:2/4;
+  grid-column:2/3;
+  display:flex;
+  flex-direction:column;
+  justify-content: center;
+  align-items: center;
+}
+#leadboard_paginate, #leadboard_length{
+  display:none;
+}
+#games-container{
+  grid-row:4/5;
+  grid-column:2/3;
+  display:flex;
+  flex-direction:column;
+  justify-content: center;
+  align-items: center;
+  overflow-y: scroll;
+}
+
+
+table.dataTable tbody tr{
+  background-color: inherit;
+}

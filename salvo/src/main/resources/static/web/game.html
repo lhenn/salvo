@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Game</title>
+  <link rel="stylesheet" href="game.css" />
+</head>
+
+<body>
+  <div id="app">
+    <div id="error-container" v-if="error!=''">
+      {{error}}
+      <a href="games.html"> <br>Back to home page >></a>
+    </div>
+    <div id="header-container">
+      <a id="home-link" href="games.html">Salvo!</a>
+    </div>
+    <div id="player-info-container">
+      <h2>
+        <span id="player-name">{{gameViewData.playerUsername}}</span> (you) vs. {{gameViewData.opponentUsername}}
+    </h2>
+    </div>
+    <div id="tables-wrapper">
+    <div id="ships-list" v-if="!shipsPlaced">
+      <table>
+        <tr id='aircraft-carrier'>
+          <td class="ship"></td>
+          <td class="ship"></td>
+          <td class="ship"></td>
+          <td class="ship"></td>
+          <td class="ship"></td>
+        </tr>
+        <tr id='battleship' draggable="true">
+          <td class="ship"></td>
+          <td class="ship"></td>
+          <td class="ship"></td>
+          <td class="ship"></td>
+        </tr>
+        <tr id='submarine'>
+          <td class="ship"></td>
+          <td class="ship"></td>
+          <td class="ship"></td>
+        </tr>
+        <tr id='destroyer'>
+          <td class="ship"></td>
+          <td class="ship"></td>
+          <td class="ship"></td>
+        </tr>
+        <tr id='patrol-ship'>
+          <td class="ship"></td>
+          <td class="ship"></td>
+        </tr>
+      </table>
+    </div>
+    <div id="ship-table-container">
+      <table id="ship-table" class="droptarget">
+        <tr>
+          <td class="col-label"></td>
+          <td v-for="col in cols" v-bind:class="'col-label'">{{col}}</td>
+        </tr>
+        <tr v-for="row in rows">
+          <td v-bind:class="'row-label'">{{row}}</td>
+          <td v-for="col in cols" v-bind:class="determineClass(row,col)">
+            {{getSalvoTurn('opponent', row, col)}}
+          </td>
+        </tr>
+      </table>
+    </div>
+    <div v-if="shipsPlaced" id="salvo-table-container">
+      <table id="salvo-table">
+        <tr>
+          <td class="col-label"></td>
+          <td v-for="col in cols" v-bind:class="'col-label'">{{col}}</td>
+        </tr>
+        <tr v-for="row in rows">
+          <td v-bind:class="'row-label'">{{row}}</td>
+          <td v-for="col in cols" v-bind:class="{salvo:checkIfSalvo('player',row,col)}">{{getSalvoTurn('player', row, col)}}</td>
+        </tr>
+
+      </table>
+    </div>
+  </div>
+
+  </div>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script src="game.js"></script>
+</body>
+
+</html>

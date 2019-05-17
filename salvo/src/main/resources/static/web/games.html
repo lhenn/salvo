@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Games</title>
+  <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/v/dt/dt-1.10.18/datatables.min.css" />
+  <link rel="stylesheet" href="games.css" />
+</head>
+
+<body>
+  <div id="app">
+
+    <div id="register-container" v-bind:class="{displayed:register,hidden:!register}">
+      <div id="register-wrapper">
+        <div id="reg-head">
+          <button class="window-close" @click="register=!register; regName='';
+          regPass=''; confirmPass=''; regFeedback='';">&times;</button>
+        </div>
+        <div id="register-form">
+          <div class="form-line">
+            <h2>Create an account!</h2>
+          </div>
+          <div class="form-line">
+            <label>Email: </label>
+            <input type="text" v-model="regName"></input>
+          </div>
+          <div class="form-line">
+            <label>Create a password: </label>
+            <input type="text" v-model="regPass"></input>
+          </div>
+          <div class="form-line">
+            <label>Confirm password: </label>
+            <input type="text" v-model="confirmPass"></input>
+          </div>
+          <div class="form-line" id="feedback-wrapper">
+            <div class="error-message" v-if="regFeedback=='error'">Something went wrong. <br>(You may already have an account or your passwords don't match).</div>
+            <div v-if="regFeedback=='success'">Account has been created. <button id="sign-in-here" @click="register=!register">Login here >></button> </div>
+          </div>
+          <div class="form-line" id="submit-btn-container" v-if="regFeedback!='success'">
+            <button class="btn" id="register-btn" @click="createAccount">Submit</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="logout-container" v-if="loggedIn==true">
+        <button id="logout-button" @click=logout>Logout >></button>
+    </div>
+
+    <div id="header-container">
+      <h1>SALVO!</h1>
+    </div>
+
+    <div id="login-container" v-if="!loggedIn && !register">
+      <form id="login-form" onsubmit="return false">
+        <h2 class="form-line" id="login-header">
+          Login >>
+        </h2>
+        <div class="form-line">
+          <label>Username: </label>
+          <input type="text" name="username" v-model="username" placeholder="email">
+        </div>
+        <div class="form-line">
+          <label>Password: </label>
+          <input type="text" name="password" v-model="password">
+        </div>
+        <div class="form-line">
+          <span class="error-message" v-if="error=='error'">Username and/or password not recognized.</span>
+          <span v-if="error=='blank'">Please enter your username and password above.</span>
+        </div>
+        <div class="form-line" id="submit-btn-container">
+          <input class="btn" id="submit-btn" type="submit" name="submit" value="Submit" @click="login">
+        </div>
+      </form>
+      <button id="reg-button" @click="register=true">Create an account!</button>
+    </div>
+
+    <div id="logged-in-container" v-if=loggedIn>
+      <h2>Welcome, <br> <span class="yellow">{{gamesAndPlayerData.player.username}}</span>!</h2>
+      <button id="new-game-btn" @click = startNewGame>Start a new game!</button>
+    </div>
+
+    <div id="leaderboard-container">
+      <h2>*** Leaderboard ***</h2>
+      <table id="leadboard"></table>
+    </div>
+
+    <div id="games-container">
+      <h2>Current Games</h2>
+      <ol id="games-list">
+          <li v-for="game in gamesData">
+            <a v-if="createReturnLink(game)!=null" v-bind:href="createReturnLink(game)">{{getGamePlayers(game)[0]}} vs. {{getGamePlayers(game)[1]}} -- created @ {{createDate(game.created)}}</a>
+            <div v-else>
+              {{getGamePlayers(game)[0]}} vs. {{getGamePlayers(game)[1]}} -- created @ {{createDate(game.created)}}
+              <button v-if="getGamePlayers(game)[1]=='N/A' && loggedIn" id="join-btn" @click="joinGame(game)">Join!</button>
+            </div>
+          </li>
+      </ol>
+    </div>
+
+  </div>
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+  <script type="text/javascript" src="https://cdn.datatables.net/v/dt/dt-1.10.18/datatables.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+  <script src="games.js"></script>
+</body>
+
+</html>
