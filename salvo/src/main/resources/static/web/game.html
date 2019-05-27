@@ -15,72 +15,139 @@
     </div>
     <div id="header-container">
       <a id="home-link" href="games.html">Salvo!</a>
+      <div id="player-info-container">
+        <h2>
+          <span class="underline">
+            {{gameViewData.playerUsername}}
+          </span> (you) vs. {{gameViewData.opponentUsername}}
+        </h2>
+      </div>
     </div>
-    <div id="player-info-container">
-      <h2>
-        <span id="player-name">{{gameViewData.playerUsername}}</span> (you) vs. {{gameViewData.opponentUsername}}
-    </h2>
-    </div>
-    <div id="tables-wrapper">
-    <div id="ships-list" v-if="!shipsPlaced">
-      <table>
-        <tr id='aircraft-carrier'>
-          <td class="ship"></td>
-          <td class="ship"></td>
-          <td class="ship"></td>
-          <td class="ship"></td>
-          <td class="ship"></td>
-        </tr>
-        <tr id='battleship' draggable="true">
-          <td class="ship"></td>
-          <td class="ship"></td>
-          <td class="ship"></td>
-          <td class="ship"></td>
-        </tr>
-        <tr id='submarine'>
-          <td class="ship"></td>
-          <td class="ship"></td>
-          <td class="ship"></td>
-        </tr>
-        <tr id='destroyer'>
-          <td class="ship"></td>
-          <td class="ship"></td>
-          <td class="ship"></td>
-        </tr>
-        <tr id='patrol-ship'>
-          <td class="ship"></td>
-          <td class="ship"></td>
-        </tr>
-      </table>
-    </div>
-    <div id="ship-table-container">
-      <table id="ship-table" class="droptarget">
-        <tr>
-          <td class="col-label"></td>
-          <td v-for="col in cols" v-bind:class="'col-label'">{{col}}</td>
-        </tr>
-        <tr v-for="row in rows">
-          <td v-bind:class="'row-label'">{{row}}</td>
-          <td v-for="col in cols" v-bind:class="determineClass(row,col)">
-            {{getSalvoTurn('opponent', row, col)}}
-          </td>
-        </tr>
-      </table>
-    </div>
-    <div v-if="shipsPlaced" id="salvo-table-container">
-      <table id="salvo-table">
-        <tr>
-          <td class="col-label"></td>
-          <td v-for="col in cols" v-bind:class="'col-label'">{{col}}</td>
-        </tr>
-        <tr v-for="row in rows">
-          <td v-bind:class="'row-label'">{{row}}</td>
-          <td v-for="col in cols" v-bind:class="{salvo:checkIfSalvo('player',row,col)}">{{getSalvoTurn('player', row, col)}}</td>
-        </tr>
+    <div id="content">
+      <div id="set-up-view" v-if="!shipsPlaced">
+        <div id="ships-list-container" v-if="!shipsPlaced">
+          <div id="ships-list-header">
+            <p>Welcome, {{gameViewData.playerUsername}}!</p>
+            <p>Place each battleship below on the grid.</p>
+          </div>
+          <div id="orientation-control">
+            <span class="label">horizonal</span>
+            <label class="switch">
+              <input type="checkbox" @click="resetShadowOrientation()">
+              <span class="slider round"></span>
+            </label>
+            <span class="label">vertical</span>
+          </div>
+          <table id="ships-list">
+            <tr v-for="ship in ships">
+              <td><span class="check" v-if="ship.locations.length>0">&#10004;</span></td>
+              <td class="name">
+                <button class="ship-type" @click="selectedShip=ship;" v-bind:class="{active:selectedShip==ship, done:ship.locations.length>0}">
+                  {{ship.type}}
+                </button>
+              </td>
+              <td class="ship-pic">
+                <div v-for="cell in ship.length" class="ship-div"></div>
+              </td>
+              <td><button class="reposition" v-if="ship.locations.length>0" @click="selectedShip=ship; clearShipLocations(ship); resetShadow()">reposition</button></td>
+            </tr>
+          </table>
+          <div id=ships-list-submit>
+            <button v-if="checkIfShipsPlaced()" id="ships-submit" @click="saveShips()">Submit ship positions</button>
+          </div>
+        </div>
+        <div id="ship-table-container">
+          <table id="ship-placement-table">
+            <tr>
+              <td class="col-label"></td>
+              <td v-for="col in cols" v-bind:class="'col-label'">{{col}}</td>
+            </tr>
+            <tr v-for="row in rows">
+              <td v-bind:class="'row-label'">{{row}}</td>
+              <td v-for="col in cols" v-bind:id="row + col" @mouseover="getShadowLocation(row,col)" @click="placeShip" v-bind:class="determineShipPlacingClass(row, col)">
+              </td>
+            </tr>
+          </table>
+        </div>
+      </div>
+      <div id="game-view" v-if="shipsPlaced">
+        <div id="stats-container">
 
-      </table>
+          <div id="player-stats">
+            <h3 class="underline yellow">{{gameViewData.playerUsername}}</h3>
+            <table class="stats">
+              <tr v-for="ship in playerStats">
+                <td class="name" v-bind:class="{sunk: ship.hits==ship.length}">{{ship.type}}</td>
+                <td class="ship-pic">
+                  <div class="hit-div" v-for="i in ship.hits"></div>
+                  <div class="ship-div" v-for="j in (ship.length-ship.hits)"></div>
+                </td>
+              </tr>
+            </table>
+          </div>
+
+          <div id="opponent-stats">
+            <h3 class="yellow">{{gameViewData.opponentUsername}}</h3>
+            <table class="stats">
+              <tr v-for="ship in opponentStats">
+                <td class="name" v-bind:class="{sunk: ship.hits==ship.length}">{{ship.type}}</td>
+                <td class="ship-pic">
+                  <div class="hit-div" v-for="i in ship.hits"></div>
+                  <div class="ship-div" v-for="j in (ship.length-ship.hits)"></div>
+                </td>
+
+              </tr>
+            </table>
+          </div>
+        </div>
+
+        <div id="tables-wrapper">
+
+        <table id="ship-table">
+          <tr>
+            <td class="col-label"></td>
+            <td v-for="col in cols" v-bind:class="'col-label'">{{col}}</td>
+          </tr>
+          <tr v-for="row in rows">
+            <td v-bind:class="'row-label'">{{row}}</td>
+            <td v-for="col in cols" v-bind:id="row + col" v-bind:class="determineShipTableClass(row,col)">
+              {{getSalvoTurn('opponent', row, col)}}
+            </td>
+          </tr>
+        </table>
+
+
+
+          <div id="shots-container" v-if="!checkIfSalvoComplete()">
+            <div class="yellow">Your move: select shot locations on the grid. </div>
+            <div id="shots">
+              <div class="shot" v-for="shot in (5 - currentSalvo.locations.length)"></div>
+            </div>
+          </div>
+
+          <table id="salvo-table">
+            <tr>
+              <td class="col-label"></td>
+              <td v-for="col in cols" v-bind:class="'col-label'">{{col}}</td>
+            </tr>
+            <tr v-for="row in rows">
+              <td v-bind:class="'row-label'">{{row}}</td>
+              <td v-for="col in cols" @mouseover="getSalvoShadow(row, col)" @click="shootSalvo(row, col)" v-bind:class="determineSalvoTableClass(row, col)">{{getSalvoTurn('player', row, col)}}</td>
+            </tr>
+          </table>
+
+          <div id="salvos-submit-container">
+            <button v-if="checkIfSalvoComplete()" id="salvos-submit" @click="saveSalvos()">Fire salvo!</button>
+          </div>
+
+
+      </div>
+
+
+
+      </div>
+
     </div>
-  </div>
 
   </div>
 

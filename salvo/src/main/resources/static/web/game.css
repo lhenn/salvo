@@ -5,13 +5,35 @@ body {
   color: white;
   font-family: "Courier New";
 }
+h3{
+  margin: 1%;
+}
 a {
+  color:yellow;
+}
+button:focus{
+  outline: 0;
+}
+button{
+  background-color:#295443;
+  color:white;
+  font-family: "Courier New";
+  padding:3%;
+  margin:1% 0;
+  font-size:18px;
+  white-space: nowrap;
+}
+button:hover{
+  font-weight: bold;
+  border: solid 2px white;
+}
+.yellow{
   color:yellow;
 }
 #app {
   display: grid;
   height: 100vh;
-  grid-template-rows: auto auto 1fr;
+  grid-template-rows: auto 1fr;
 }
 #error-container{
   display:flex;
@@ -24,10 +46,16 @@ a {
   height:auto;
 }
 #header-container{
-  padding:1%;
+  grid-row: 1/2;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+
 }
 #home-link {
-  grid-row: 1/2;
+  position: absolute;
+  top: 1%;
+  left:1%;
   font-family: "Impact";
   color: #b20f03;
   border: 0;
@@ -40,93 +68,303 @@ a {
 }
 
 #player-info-container {
-  grid-row: 2/3;
   display: flex;
   justify-content: center;
   align-items: baseline;
   margin-bottom: 1%;
+  width:100%;
 }
-
-#score-info-container {
-  padding: 2%;
-  background-color: #132282;
-  border-radius: 20px;
-}
-
 #player-info-container h2 {
   padding: 2%;
   margin: 0 0 2% 0;
   background-color: #b20f03;
   border-radius: 20px;
   box-shadow: 4px 10px 49px -6px rgba(0, 0, 0, 1);
+  white-space:nowrap;
 }
 
-#player-name {
+.underline {
   text-decoration: underline;
 }
 
-#tables-wrapper {
-  grid-row: 3/4;
+/*----------------------set-up view---------------------- */
+#set-up-view{
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+}
+#ships-list-container{
+  display:flex;
+  flex-direction:column;
+  align-items: center;
+  margin:2%;
+}
+#ships-list-header{
+  color:yellow;
+}
+#orientation-control{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width:100%;
+}
+#orientation-control .label{
+  margin:5%;
+
+}
+#ships-list{
+  border-collapse: separate;
+  border-spacing:2px 20px;
+}
+#ships-list button.active, #ships-list button.done{
+  background-color: darkblue;
 }
 
+td.name{
+  width:auto;
+  padding-right:20px;
+  text-align: left;
+}
+td.ship-pic{
+  display:flex;
+  width:auto;
+  align-items: center;
+}
+.ship-div{
+  background-color: grey;
+  height:25px;
+  width:25px;
+  margin:1px;
+}
+.reposition{
+  background-color: inherit;
+  font-size: 10px;
+  border:0;
+  color:grey;
+}
+.reposition:hover{
+  color:yellow;
+  font-weight: normal;
+  border:0;
+}
+button.ship-type{
+  background-color: #262626;
+  border:2px solid darkblue;
+  color:white;
+  font-family: "Courier";
+  font-size:14px;
+  padding:5%;
+  border-radius:20px;
+  white-space: nowrap;
+}
+.ship-type:hover{
+  background-color: darkblue;
+}
+.check{
+  color:yellow;
+}
+/*----------------------GENERAL TABLES---------------------- */
 td {
-  width: 45px;
-  height: 45px;
+  width: 37px;
+  height: 37px;
   text-align: center;
 }
-
-#ships-list tr{
-  position: absolute;
-}
-#ships-list td.ship{
-  background-color: grey;
-}
-
-
-#salvo-table, #ship-table {
-  border-collapse: collapse;
-  border: solid 1px white;
-}
-
-#salvo-table td {
-  background-color: #295443;
-  border: solid 1px white;
-}
-
-#ship-table td {
-  background-color: #4373e8;
-  border: solid 1px white;
-}
-
-#ship-table td.ship {
-  background-color: grey;
-}
-#ship-table td.droptarget:hover{
-  background-color: blue;
-}
-
 td.row-label, td.col-label {
   border: none;
   font-size: 20px;
   font-weight: bold;
 }
-
 td.row-label {
   color: yellow;
 }
+#ship-placement-table{
+  align-self: center;
+}
+table {
+  border-collapse: collapse;
+  border-spacing:0;
+  padding:0;
+  margin: 0;
+  border-spacing:0;
+}
+#ship-placement-table td, #ship-table td, #salvo-table td{
+  background-color: #4373e8;
+  border: solid 1px white;
+}
 
+#ship-placement-table td.ship-shadow{
+  background-color: green;
+}
+#ship-placement-table td.illegal-ship-shadow{
+  background-color: red;
+}
+#ship-placement-table td.placed-ship{
+  background-color: grey;
+}
+/*----------------------game view---------------------- */
+#game-view{
+  display:flex;
+  justify-content: space-around;
+  align-items: center;
+  height:100%;
+}
+#tables-wrapper{
+  display:grid;
+  height:100%;
+  grid-template-rows: 15% 70% 15%;
+  grid-template-columns: 1fr 1fr;
+}
+#ship-table, #salvo-table{
+  margin:2%;
+}
+#salvo-table td{
+  background-color: #295443;
+}
+#salvo-table td.salvo{
+  background-color: white;
+  opacity: 0.9;
+  color: grey;
+}
+#salvo-table td.salvo-shadow{
+  background-color:#bf510d;
+
+}
+#salvo-table td.stupid-salvo{
+  background-color:red;
+}
+#salvo-table td.current-salvo{
+  background-color:#f47702;
+}
+
+#salvo-table{
+  grid-row:2/3;
+  grid-column:2/3;
+}
+#shots-container{
+  grid-row:1/2;
+  grid-column:2/3;
+  display: flex;
+  flex-direction: column;
+}
+#salvos-submit-container{
+  grid-row:3/4;
+  grid-column:2/3;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+#shots{
+  display: flex;
+  flex-direction: row;
+}
+#shots-container .shot{
+  background-color:#f47702;
+  height: 25px;
+  width:25px;
+  margin:2%;
+}
+#salvos-submit{
+  background-color:darkblue;
+}
+#ship-table{
+  grid-row:2/3;
+  grid-column:1/2;
+}
+#ship-table td.ship {
+  background-color: grey;
+}
 #ship-table td.salvo {
   background-color: white;
   opacity: 0.9;
   color: grey;
 }
-
-#ship-table td.hit {
+#ship-table td.hit, #salvo-table td.hit {
   background-color: #b20f03;
   font-weight: bold;
 }
 
-#tables-wrapper {
-  display: flex;
+/* ----------------------stats stuff---------------------- */
+#stats-container{
+  display:flex;
+  flex-direction: column;
+  align-items: center;
   justify-content: space-around;
+  /* height: 100%; */
+  padding:3%;
+  background-color: #262626;
+}
+table.stats{
+  margin:5%;
+}
+
+table.stats tr{
+  padding:0;
+}
+table.stats .ship-div{
+  width:20px;
+  height:20px;
+}
+table.stats .hit-div{
+  width:20px;
+  height:20px;
+  background-color: #b20f03;
+  margin:1px;
+}
+table.stats td.name{
+  padding: 1%;
+  width:auto;
+  word-wrap: normal;
+}
+table.stats td.sunk{
+  padding:1%;
+  color:#b20f03;
+
+}
+
+
+
+/* ----------------------toggle button---------------------- */
+.switch {
+  position: relative;
+  display: inline-block;
+  width: 50px;
+  height: 30px;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: #ccc;
+  transition: .1s;
+  border-radius: 34px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 26px;
+  width: 26px;
+  left: 2px;
+  bottom: 2px;
+  background-color: white;
+  transition: .1s;
+  border-radius: 50%;
+}
+
+input + .slider {
+  background-color: #295443;
+}
+
+input:checked + .slider:before {
+  transform: translateX(20px);
 }

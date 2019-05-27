@@ -29,6 +29,9 @@ public class SalvoController {
     @Autowired
     private ShipRepository shipRepository;
 
+    @Autowired
+    private SalvoRepository salvoRepository;
+
 
 
     @RequestMapping(path = "/players", method = RequestMethod.POST)
@@ -117,9 +120,38 @@ public class SalvoController {
         } else {
             return new ResponseEntity<>(makeMap("error", "Unauthorized"), HttpStatus.UNAUTHORIZED);
         }
+    }
+    @RequestMapping(path = "/games/players/{gamePlayerId}/salvos", method = RequestMethod.POST)
+    public ResponseEntity<Map<String,Object>> addSalvos(@PathVariable Long gamePlayerId,
+                                                       @RequestBody Salvo salvo,
+                                                       Authentication authentication){
+        GamePlayer gameplayer = gamePlayerRepository.getOne(gamePlayerId);
+        Player loggedPlayer = getLoggedPlayer(authentication);
+        if (gameplayer != null && loggedPlayer != null) {
+            if(loggedPlayer.getId() == gameplayer.getPlayer().getId()) {
+                salvo.setTurn(getTurn(gameplayer) + 1);
+                salvo.setGameplayer(gameplayer);
+                salvoRepository.save(salvo);
+                return new ResponseEntity<Map<String,Object>>(makeMap("success", "Salvos have been fired."), HttpStatus.CREATED);
 
+            } else {
+                return new ResponseEntity<>(makeMap("error", "Unauthorized"), HttpStatus.UNAUTHORIZED);
+            }
+        } else {
+            return new ResponseEntity<>(makeMap("error", "Unauthorized"), HttpStatus.UNAUTHORIZED);
+        }
     }
 
+    private Integer getTurn(GamePlayer gameplayer) {
+        Set <Salvo> playerSalvos = gameplayer.getSalvos();
+
+        return playerSalvos
+                .stream()
+                .map(s -> s.getTurn())
+                .mapToInt(s -> s)
+                .max().orElse(0);
+
+    }
 
     @RequestMapping("/leaderboard")
     private List<Object> getLeaderboard() {
@@ -147,14 +179,13 @@ public class SalvoController {
         dto.put("playerUsername", gamePlayer.getPlayer().getUserName());
         dto.put("game", gameDTO(gamePlayer.getGame()));
         if(gamePlayer.getShips().size() != 0)
-        dto.put("ships", gamePlayer.getShips()
-            .stream()
-            .map(ship -> shipDTO(ship))
-            .collect(Collectors.toList()));
+            dto.put("ships",getShips(gamePlayer));
         dto.put("playerSalvos", gamePlayer.getSalvos()
             .stream()
             .map(salvo -> salvoDTO(salvo))
             .collect(Collectors.toList()));
+        dto.put("playerHits",getHits(gamePlayer));
+
         if(getOpponent(gamePlayer) != null) {
             GamePlayer gamePlayerOpponent = getOpponent(gamePlayer);
             opponentUsername = gamePlayerOpponent.getPlayer().getUserName();
@@ -162,14 +193,72 @@ public class SalvoController {
                 .stream()
                 .map(salvo -> salvoDTO(salvo))
                 .collect(Collectors.toList());
+            dto.put("opponentHits",getHits(gamePlayerOpponent));
         } else {
             opponentUsername = "N/A";
             opponentSalvos = new ArrayList<Object>();
         }
         dto.put("opponentUsername",opponentUsername);
         dto.put("opponentSalvos",opponentSalvos);
+
         return new ResponseEntity<>(dto,HttpStatus.ACCEPTED);
     }
+
+    // one method to find all shots
+    private List<String> getShots(GamePlayer gameplayer) {
+        ArrayList<String> shots = new ArrayList<>();
+        Set<Salvo> salvos = gameplayer.getSalvos();
+        for (Salvo salvo : salvos) {
+            List<String> locations = salvo.getLocations();
+            for (String location : locations) {
+                shots.add(location);
+            }
+        }
+        return shots;
+    }
+
+    private List<Map<String,Object>> getShipsLocations(GamePlayer gameplayer) {
+        ArrayList<Map<String,Object>> ships = new ArrayList<>();
+        Set<Ship> setOfShips = gameplayer.getShips();
+        for (Ship ship : setOfShips) {
+            List<String> locations = ship.getLocations();
+            for (String location : locations) {
+                Map<String, Object> dto = new LinkedHashMap<>();
+                dto.put("type",ship.getType());
+                dto.put("location", location);
+                ships.add(dto);
+            }
+        }
+        return ships;
+    }
+
+    private List<Object> getHits(GamePlayer gameplayer) {
+        List<Object> hits = new ArrayList<>();
+        List<String> shots = getShots(getOpponent(gameplayer));
+        List<Map<String,Object>> ships = getShipsLocations(gameplayer);
+        for (Map<String, Object> ship : ships) {
+            if (shots.contains(ship.get("location"))){
+                hits.add(ship);
+            }
+        }
+
+        return hits;
+    }
+    private Map<String, Object> hitDTO(Ship ship){
+        Map<String, Object> dto = new LinkedHashMap<>();
+        dto.put("type",ship.getType());
+        dto.put("location",ship.getLocations());
+        return dto;
+
+    }
+
+    private List<Map<String, Object>> getShips(GamePlayer gameplayer) {
+        return gameplayer.getShips()
+                .stream()
+                .map(ship -> shipDTO(ship))
+                .collect(Collectors.toList());
+    }
+
 
     private Map<String, Object> makeMap(String key, Object value) {
         Map<String, Object> map = new HashMap<>();
