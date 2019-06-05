@@ -3,6 +3,7 @@ const app = new Vue({
   data: {
     gp: window.location.search.split('=')[1] || null,
     gameViewData: {},
+    gameState: "",
     shipLocations: [],
     playerSalvos: [],
     opponentSalvos: [],
@@ -50,6 +51,10 @@ const app = new Vue({
   },
   created: function() {
     this.getData();
+
+    setInterval(function(){
+      this.getData();
+    }.bind(this), 5000);
   },
   methods: {
     getData: async function() {
@@ -64,10 +69,10 @@ const app = new Vue({
           .then((json) => json)
           .catch(function(error) {
             console.error(error);
-
           })
         if (json.error) this.error = "You are not authorized to see this page."
         this.gameViewData = json;
+        this.gameState = this.gameViewData.gameState;
         if (json.ships) {
           this.shipsPlaced = true;
           this.getShipLocations();
@@ -77,9 +82,22 @@ const app = new Vue({
           this.opponentStats = this.getShipStats('opponent');
         }
         console.log(app.gameViewData);
+        console.log("gameState: ", this.gameState);
       } else {
         this.error = 'Sorry something went wrong -- please find your game through our home page.'
       }
+    },
+    getGameState: async function() {
+      let json = await fetch('/api/game_state/' + this.gp,{
+        method: "GET"
+      })
+      .then(function(response) {
+        return response.json();
+      })
+      .then((json) => json)
+      .catch(function(error) {
+        console.error(error);
+      })
     },
     saveShips: async function() {
       let json = await fetch('/api/games/players/' + this.gp + '/ships', {

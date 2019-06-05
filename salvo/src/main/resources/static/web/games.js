@@ -18,6 +18,7 @@ const app = new Vue({
   created: function() {
     this.getGamesData();
     this.getLeaderBoardData();
+    
   },
   methods: {
     getGamesData: function() {
@@ -67,7 +68,6 @@ const app = new Vue({
         .then(function(json) {
           if (json.ok) {
             console.log(json);
-            app.loggedIn = true;
             app.getGamesData();
           } else if (!json.ok && app.username == "" && app.password == "") {
             app.error = "blank";

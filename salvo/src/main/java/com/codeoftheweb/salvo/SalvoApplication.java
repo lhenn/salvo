@@ -297,12 +297,14 @@ class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 
 		http.headers().frameOptions().disable();
 		http.authorizeRequests()
-//				.antMatchers("/web/**").permitAll()
-//				.antMatchers("/api/leaderboard").permitAll()
-//				.antMatchers("/api/login").permitAll()
-//				.antMatchers("/api/signup").permitAll()
-//				.anyRequest().fullyAuthenticated()
-				.antMatchers("/**").permitAll()
+				.antMatchers("/web/**").permitAll()
+				.antMatchers("/api/leaderboard").permitAll()
+				.antMatchers("/api/login").permitAll()
+				.antMatchers("/api/signup").permitAll()
+				.antMatchers("/api/games").permitAll()
+				
+				.anyRequest().fullyAuthenticated()
+//				.antMatchers("/**").permitAll()
 				.and()
 				.formLogin();
 
