@@ -135,7 +135,10 @@ const app = new Vue({
           console.log(error);
         })
       console.log(json);
-      if (!json.error) this.getData()
+      if (!json.error) {
+        this.currentSalvo.locations = [];
+        this.getData()
+      }
     },
     getShipLocations: function() {
       let ships = app.gameViewData.ships;
@@ -303,7 +306,9 @@ const app = new Vue({
     },
     getSalvoShadow: function(row, col) {
       this.salvoShadow = [];
+      if(this.gameState == 'fire salvo' || this.gameState == 'one more chance'){
       this.salvoShadow.push(row + col);
+      }
     },
     determineSalvoTableClass: function(row, col) {
       let cellName = "" + row + col;
@@ -367,6 +372,5 @@ const app = new Vue({
       }
       return count;
     }
-
   }
 })

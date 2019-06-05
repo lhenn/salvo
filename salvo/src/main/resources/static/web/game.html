@@ -24,7 +24,7 @@
       </div>
     </div>
     <div id="content">
-      <div id="set-up-view" v-if="!shipsPlaced">
+      <div id="set-up-view" v-if="gameState=='placing ships'">
         <div id="ships-list-container" v-if="!shipsPlaced">
           <div id="ships-list-header">
             <p>Welcome, {{gameViewData.playerUsername}}!</p>
@@ -70,7 +70,7 @@
           </table>
         </div>
       </div>
-      <div id="game-view" v-if="shipsPlaced">
+      <div id="game-view" v-if="gameState!='placing ships'">
         <div id="stats-container">
 
           <div id="player-stats">
@@ -103,45 +103,63 @@
 
         <div id="tables-wrapper">
 
-        <table id="ship-table">
-          <tr>
-            <td class="col-label"></td>
-            <td v-for="col in cols" v-bind:class="'col-label'">{{col}}</td>
-          </tr>
-          <tr v-for="row in rows">
-            <td v-bind:class="'row-label'">{{row}}</td>
-            <td v-for="col in cols" v-bind:id="row + col" v-bind:class="determineShipTableClass(row,col)">
-              {{getSalvoTurn('opponent', row, col)}}
-            </td>
-          </tr>
-        </table>
+          <div id="col1">
 
+            <div id="prompts" class="yellow">
+              <div v-if="gameState =='waiting for opponent'">Waiting for opponent to join...</div>
+              <div v-if="gameState =='opponent placing ships'">Opponent has joined and is preparing for battle...</div>
+              <div id="shots-container" v-if="gameState=='fire salvo'">
+                <div class="yellow">Your move! Select shot locations on the grid. </div>
+                <div id="shots">
+                  <div class="shot" v-for="shot in (5 - currentSalvo.locations.length)"></div>
+                </div>
+                <button v-if="checkIfSalvoComplete()" id="salvos-submit" @click="saveSalvos()">Fire salvo</button>
+              </div>
+              <div v-if="gameState=='awaiting opponent salvo'" class="yellow">Waiting for enemy response... </div>
+              <div v-if="gameState=='opponent gets one more chance'">Congrats! You've sunk all enemy ships. They have one more chance to tie the game.</div>
+              <div id="shots-container" v-if="gameState=='one more chance'">
+                <div class="yellow">All your ships have sunk! You have one more chance to tie the game. Best of luck. </div>
+                <div id="shots">
+                  <div class="shot" v-for="shot in (5 - currentSalvo.locations.length)"></div>
+                </div>
+                <button v-if="checkIfSalvoComplete()" id="salvos-submit" @click="saveSalvos()">Fire salvo</button>
+              </div>
+              <div v-if="gameState=='game won'">Congratulations, you've won the battle!</div>
+              <div v-if="gameState=='game lost'">You have lost the battle.</div>
+              <div v-if="gameState=='game tied'">Well done! Game tied.</div>
 
-
-          <div id="shots-container" v-if="!checkIfSalvoComplete()">
-            <div class="yellow">Your move: select shot locations on the grid. </div>
-            <div id="shots">
-              <div class="shot" v-for="shot in (5 - currentSalvo.locations.length)"></div>
             </div>
+
+            <table id="ship-table" class="minTable">
+              <tr>
+                <td class="col-label"></td>
+                <td v-for="col in cols" v-bind:class="'col-label'">{{col}}</td>
+              </tr>
+              <tr v-for="row in rows">
+                <td v-bind:class="'row-label'">{{row}}</td>
+                <td v-for="col in cols" v-bind:id="row + col" v-bind:class="determineShipTableClass(row,col)">
+                  {{getSalvoTurn('opponent', row, col)}}
+                </td>
+              </tr>
+            </table>
+
           </div>
 
-          <table id="salvo-table">
-            <tr>
-              <td class="col-label"></td>
-              <td v-for="col in cols" v-bind:class="'col-label'">{{col}}</td>
-            </tr>
-            <tr v-for="row in rows">
-              <td v-bind:class="'row-label'">{{row}}</td>
-              <td v-for="col in cols" @mouseover="getSalvoShadow(row, col)" @click="shootSalvo(row, col)" v-bind:class="determineSalvoTableClass(row, col)">{{getSalvoTurn('player', row, col)}}</td>
-            </tr>
-          </table>
-
-          <div id="salvos-submit-container">
-            <button v-if="checkIfSalvoComplete()" id="salvos-submit" @click="saveSalvos()">Fire salvo!</button>
+          <div id="col2">
+            <table id="salvo-table" class="maxTable">
+              <tr>
+                <td class="col-label"></td>
+                <td v-for="col in cols" v-bind:class="'col-label'">{{col}}</td>
+              </tr>
+              <tr v-for="row in rows">
+                <td v-bind:class="'row-label'">{{row}}</td>
+                <td v-for="col in cols" @mouseover="getSalvoShadow(row, col)" @click="shootSalvo(row, col)" v-bind:class="determineSalvoTableClass(row, col)">{{getSalvoTurn('player', row, col)}}</td>
+              </tr>
+            </table>
           </div>
 
 
-      </div>
+        </div>
 
 
 

@@ -18,7 +18,7 @@ const app = new Vue({
   created: function() {
     this.getGamesData();
     this.getLeaderBoardData();
-    
+
   },
   methods: {
     getGamesData: function() {
@@ -34,6 +34,7 @@ const app = new Vue({
           if (json.player) {
             app.loggedIn = true;
           }
+          console.log(json);
         })
         .catch(function(error) {
           console.log(error);

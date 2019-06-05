@@ -82,6 +82,15 @@ button:hover{
   box-shadow: 4px 10px 49px -6px rgba(0, 0, 0, 1);
   white-space:nowrap;
 }
+/* #logout-button {
+  background-color: inherit;
+  color:lightgrey;
+  font-family: "Courier New";
+  border:0;
+  margin:2%;
+  white-space:nowrap;
+  font-size:16px;
+} */
 
 .underline {
   text-decoration: underline;
@@ -201,33 +210,26 @@ table {
 #ship-placement-table td.placed-ship{
   background-color: grey;
 }
-/*----------------------game view---------------------- */
-#game-view{
-  display:flex;
-  justify-content: space-around;
-  align-items: center;
-  height:100%;
-}
-#tables-wrapper{
-  display:grid;
-  height:100%;
-  grid-template-rows: 15% 70% 15%;
-  grid-template-columns: 1fr 1fr;
-}
 #ship-table, #salvo-table{
   margin:2%;
 }
 #salvo-table td{
   background-color: #295443;
 }
-#salvo-table td.salvo{
+#ship-table td.ship, #salvo-table td.ship {
+  background-color: grey;
+}
+#salvo-table td.salvo, #ship-table td.salvo{
   background-color: white;
   opacity: 0.9;
   color: grey;
 }
+#ship-table td.hit, #salvo-table td.hit {
+  background-color: #b20f03;
+  font-weight: bold;
+}
 #salvo-table td.salvo-shadow{
   background-color:#bf510d;
-
 }
 #salvo-table td.stupid-salvo{
   background-color:red;
@@ -235,22 +237,46 @@ table {
 #salvo-table td.current-salvo{
   background-color:#f47702;
 }
-
-#salvo-table{
-  grid-row:2/3;
-  grid-column:2/3;
+/*----------------------game view---------------------- */
+#game-view{
+  display:flex;
+  justify-content: space-around;
+  align-items: center;
+  height:100%;
+  width:100%;
 }
-#shots-container{
-  grid-row:1/2;
-  grid-column:2/3;
+
+#tables-wrapper{
+  display:flex;
+  flex-direction:row;
+  height:100%;
+  justify-content: space-around;
+  width:100%;
+
+}
+#col1{
+  display:flex;
+  flex-direction:column;
+  height:100%;
+  justify-content: space-around;
+  align-items: flex-end;
+  margin:0 2%;
+}
+#prompts{
+  height: 150px;
+  width:450px;
+  background-color:#262626;
+  padding:2%;
   display: flex;
   flex-direction: column;
-}
-#salvos-submit-container{
-  grid-row:3/4;
-  grid-column:2/3;
-  display: flex;
   justify-content: center;
+  align-items: center;
+}
+#shots-container{
+  display:flex;
+  flex-direction:column;
+  justify-content: space-around;
+  height:100%;
   align-items: center;
 }
 #shots{
@@ -265,23 +291,24 @@ table {
 }
 #salvos-submit{
   background-color:darkblue;
+
 }
-#ship-table{
-  grid-row:2/3;
-  grid-column:1/2;
+#ship-table td{
+  height:30px;
+  width:30px;
+  font-size: 14px;
 }
-#ship-table td.ship {
-  background-color: grey;
+#col2{
+  display:flex;
+  flex-direction: column;
+  justify-content: center;
 }
-#ship-table td.salvo {
-  background-color: white;
-  opacity: 0.9;
-  color: grey;
+#salvo-table td{
+  height:45px;
+  width: 45px;
+  font-size:16px;
 }
-#ship-table td.hit, #salvo-table td.hit {
-  background-color: #b20f03;
-  font-weight: bold;
-}
+
 
 /* ----------------------stats stuff---------------------- */
 #stats-container{

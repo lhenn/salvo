@@ -33,7 +33,7 @@ public class SalvoController {
     private SalvoRepository salvoRepository;
 
 
-    // api stuff for home page
+    // api stuff for home page ----------------------------------------------------------
     @RequestMapping(path = "/players", method = RequestMethod.POST)
     public ResponseEntity<Object> register(
             @RequestParam String userName, @RequestParam String password) {
@@ -105,7 +105,8 @@ public class SalvoController {
 
     }
 
-    // api stuff for game view
+    // api stuff for game view  ----------------------------------------------------------
+
     @RequestMapping(path = "/games/players/{gamePlayerId}/ships", method = RequestMethod.POST)
     public ResponseEntity<Map<String,Object>> addShips(@PathVariable Long gamePlayerId,
                                            @RequestBody Set<Ship> ships,
@@ -200,6 +201,7 @@ public class SalvoController {
 
         return new ResponseEntity<>(dto,HttpStatus.ACCEPTED);
     }
+    // helper functions ----------------------------------------------------------
 
     private Integer getTurn(GamePlayer gameplayer) {
         Set <Salvo> playerSalvos = gameplayer.getSalvos();
@@ -212,17 +214,18 @@ public class SalvoController {
     }
 
     private boolean checkIfAllSunk(GamePlayer gameplayer) {
-        Set<Ship> setOfShips = gameplayer.getShips();
+        List<Map<String,Object>> ships = getShipsLocations(gameplayer);
         List<Object> hits = getHits(gameplayer);
-        if(hits.size() == 0) return false;
-        for (Ship ship : setOfShips) {
-            for (Object hit : hits) {
-                if (!ship.getLocations().contains(hit)) {
-                    return false;
-                }
-            }
-        }
-        return true;
+        if(ships.size() == hits.size()) return true;
+        else return false;
+    }
+
+    // to see if a tie is possible on last turn
+    private boolean checkIfTiePossible(GamePlayer gameplayer){
+        List<Map<String,Object>> ships = getShipsLocations(gameplayer);
+        List<Object> hits = getHits(gameplayer);
+        if(ships.size() - hits.size()<=6) return true;
+        else return false;
     }
 
     String getGameState(GamePlayer gameplayer) {
@@ -231,40 +234,31 @@ public class SalvoController {
         if(gameplayer.getShips().size()==0) return "placing ships";
         if(opponent == null) return "waiting for opponent";
         if(opponent.getShips().size() == 0) return "opponent placing ships";
-
+        // The player who joins the game gets first turn. The player who starts a game gets second turn.
         boolean firstTurnPlayer = false;
         if(gameplayer.getId()>opponent.getId()) firstTurnPlayer = true;
-
+        // if you are firstTurnPlayer and have sunk all opponents's ships but have had one more turn: opponent gets one more turn
+        // as long as there is a chance of a tie.
+        if(firstTurnPlayer && getTurn(gameplayer) > getTurn(opponent)) {
+            if(checkIfAllSunk(opponent) && checkIfTiePossible(gameplayer)) return "opponent gets one more chance";
+        }
+        // vice-versa: if you have had all your ships sunk but one less turn than your opponent, you get one more chance
+        if(!firstTurnPlayer && getTurn(gameplayer) < getTurn(opponent)) {
+            if(checkIfAllSunk(gameplayer) && checkIfTiePossible(opponent)) return "one more chance";
+        }
+        if(checkIfAllSunk(gameplayer) && checkIfAllSunk(opponent)) return "game tied";
+        if(checkIfAllSunk(gameplayer)) return "game lost";
+        if(checkIfAllSunk(opponent)) return "game won";
         if( ( firstTurnPlayer && getTurn(gameplayer) == getTurn(opponent) ) ||
                 (!firstTurnPlayer && getTurn(gameplayer) < getTurn(opponent) ) ) {
-              if(checkIfAllSunk(gameplayer) && checkIfAllSunk(opponent)) return "game tied";
-                   else if(checkIfAllSunk(gameplayer)) return "game lost";
-                   else if(checkIfAllSunk(opponent)) return "game won";
-                   else return "fire salvo";
+            return "fire salvo";
         } else {
-              return "awaiting opponent salvo";
+            return "awaiting opponent salvo";
         }
-
-//        if(firstTurnPlayer){
-//            if(getTurn(gameplayer) == getTurn(opponent)) {
-//                if(checkIfAllSunk(gameplayer) && checkIfAllSunk(opponent)) return "game tied";
-//                else if(checkIfAllSunk(gameplayer)) return "game lost";
-//                else if(checkIfAllSunk(opponent)) return "game won";
-//                else return "fire salvo";
-//            } else {
-//                return "awaiting opponent salvo";
-//            }
-//        } else {
-//            if(getTurn(gameplayer)< getTurn(opponent)) {
-//                if(checkIfAllSunk(gameplayer) && checkIfAllSunk(opponent)) return "game tied";
-//                else if(checkIfAllSunk(gameplayer)) return "game lost";
-//                else if(checkIfAllSunk(opponent)) return "game won";
-//                else return "fire salvo";
-//            }
-//            else return "awaiting opponent salvo";
-//        }
-
     }
+
+
+
 
     private List<String> getShots(GamePlayer gameplayer) {
         System.out.println(gameplayer);
@@ -294,7 +288,6 @@ public class SalvoController {
         return ships;
     }
 
-    //
     private List<Object> getHits(GamePlayer gameplayer) {
         List<Object> hits = new ArrayList<>();
 
