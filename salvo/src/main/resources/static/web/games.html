@@ -48,7 +48,7 @@
         <button id="logout-button" @click=logout>Logout >></button>
     </div>
 
-
+    
 
     <div id="header-container">
       <h1>SALVO!</h1>
@@ -65,7 +65,7 @@
         </div>
         <div class="form-line">
           <label>Password: </label>
-          <input type="text" name="password" v-model="password">
+          <input type="password" name="password" v-model="password">
         </div>
         <div class="form-line">
           <span class="error-message" v-if="error=='error'">Username and/or password not recognized.</span>
@@ -80,7 +80,7 @@
 
     <div id="logged-in-container" v-if=loggedIn>
       <h2>Welcome, <br> <span class="yellow">{{gamesAndPlayerData.player.username}}</span>!</h2>
-      <button id="new-game-btn" @click = startNewGame>Start a new game!</button>
+      <button id="new-game-btn" @click = startNewGame>New Game</button>
     </div>
 
 
@@ -91,13 +91,13 @@
     </div>
 
     <div id="games-container">
-      <h2>Current Games</h2>
+      <h2>Games</h2>
       <ol id="games-list">
           <li v-for="game in gamesData">
             <a v-if="createReturnLink(game)!=null" v-bind:href="createReturnLink(game)">{{getGamePlayers(game)[0]}} vs. {{getGamePlayers(game)[1]}} -- created @ {{createDate(game.created)}}</a>
             <div v-else>
               {{getGamePlayers(game)[0]}} vs. {{getGamePlayers(game)[1]}} -- created @ {{createDate(game.created)}}
-              <button v-if="getGamePlayers(game)[1]=='N/A' && loggedIn" id="join-btn" @click="joinGame(game)">Join!</button>
+              <button v-if="canJoinGame(game)" id="join-btn" class="yellow" @click="joinGame(game)">-- Join!</button>
             </div>
           </li>
       </ol>

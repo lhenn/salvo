@@ -18,6 +18,14 @@ const app = new Vue({
   created: function() {
     this.getGamesData();
     this.getLeaderBoardData();
+    // every 5 seconds see if anyone started a new game
+    setInterval(function(){
+      this.getGamesData();
+    }.bind(this), 5000);
+    // every minute reload page to update leaderboard
+    setInterval(function(){
+      location.reload();
+    }.bind(this), 60000);
 
   },
   methods: {
@@ -33,6 +41,8 @@ const app = new Vue({
           app.gamesData = json.games;
           if (json.player) {
             app.loggedIn = true;
+          } else {
+            app.loggedIn= false;
           }
           console.log(json);
         })
@@ -152,9 +162,15 @@ const app = new Vue({
           console.log(error);
         })
       console.log(json);
-      // NOT SURE ABOUT ERROR
       if(json.error) this.error = json.error;
       window.location.replace("game.html?gp=" + json.gp);
+    },
+    canJoinGame: function(game){
+      if(!game.gameplayers[1] && this.loggedIn
+    && game.gameplayers[0].placedShips === 'true'){
+      return true;
+      }
+      return false;
     },
     createDate: function(date) {
       return date.substring(11, 16) + ", " + date.substring(5, 10);
@@ -174,8 +190,9 @@ const app = new Vue({
       }
       let n = -1;
       for (let i = 0; i < game.gameplayers.length; i++) {
+        // if the logged in player is one of the gameplayers
         if (app.gamesAndPlayerData.player.id === game.gameplayers[i].player.id) {
-          n = game.gameplayers[i].id;
+            n = game.gameplayers[i].id;
         }
       }
       if (n == -1) {

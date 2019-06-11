@@ -82,7 +82,7 @@ button:hover{
   box-shadow: 4px 10px 49px -6px rgba(0, 0, 0, 1);
   white-space:nowrap;
 }
-/* #logout-button {
+#logout-button {
   background-color: inherit;
   color:lightgrey;
   font-family: "Courier New";
@@ -90,7 +90,11 @@ button:hover{
   margin:2%;
   white-space:nowrap;
   font-size:16px;
-} */
+}
+#logout-button:hover{
+  color:yellow;
+  font-weight: normal;
+}
 
 .underline {
   text-decoration: underline;
@@ -99,8 +103,14 @@ button:hover{
 /*----------------------set-up view---------------------- */
 #set-up-view{
   display: flex;
-  justify-content: center;
-  align-items: flex-start;
+  height:100%;
+  flex-direction: column;
+  justify-content: space-around;
+  align-items: center;
+}
+#ship-place-content{
+  display:flex;
+  flex-direction:row;
 }
 #ships-list-container{
   display:flex;
@@ -108,8 +118,9 @@ button:hover{
   align-items: center;
   margin:2%;
 }
-#ships-list-header{
+#directions{
   color:yellow;
+
 }
 #orientation-control{
   display: flex;
@@ -213,6 +224,7 @@ table {
 #ship-table, #salvo-table{
   margin:2%;
 }
+
 #salvo-table td{
   background-color: #295443;
 }
@@ -236,6 +248,11 @@ table {
 }
 #salvo-table td.current-salvo{
   background-color:#f47702;
+}
+.inactive{
+  background-color: #232323;
+  border: solid 1px #565555;
+  color:#565555;
 }
 /*----------------------game view---------------------- */
 #game-view{
@@ -291,13 +308,18 @@ table {
 }
 #salvos-submit{
   background-color:darkblue;
-
+  width:200px;
+}
+.homelink{
+  text-align:center;
+  color:#42dff4;
 }
 #ship-table td{
   height:30px;
   width:30px;
   font-size: 14px;
 }
+
 #col2{
   display:flex;
   flex-direction: column;
@@ -316,7 +338,6 @@ table {
   flex-direction: column;
   align-items: center;
   justify-content: space-around;
-  /* height: 100%; */
   padding:3%;
   background-color: #262626;
 }

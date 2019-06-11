@@ -22,14 +22,23 @@
           </span> (you) vs. {{gameViewData.opponentUsername}}
         </h2>
       </div>
+      <div id="logout-container">
+          <button id="logout-button" @click=logout>Logout >></button>
+      </div>
     </div>
     <div id="content">
+
       <div id="set-up-view" v-if="gameState=='placing ships'">
-        <div id="ships-list-container" v-if="!shipsPlaced">
-          <div id="ships-list-header">
-            <p>Welcome, {{gameViewData.playerUsername}}!</p>
-            <p>Place each battleship below on the grid.</p>
-          </div>
+
+        <div id="directions">
+          <p>Welcome, {{gameViewData.playerUsername}}!</p>
+          <p>Place each battleship below on the grid.</p>
+        </div>
+
+        <div id="ship-place-content">
+
+        <div id="ships-list-container">
+
           <div id="orientation-control">
             <span class="label">horizonal</span>
             <label class="switch">
@@ -42,20 +51,20 @@
             <tr v-for="ship in ships">
               <td><span class="check" v-if="ship.locations.length>0">&#10004;</span></td>
               <td class="name">
-                <button class="ship-type" @click="selectedShip=ship;" v-bind:class="{active:selectedShip==ship, done:ship.locations.length>0}">
+                <button class="ship-type" @click="selectShip(ship)" v-bind:class="{active:selectedShip==ship, done:ship.locations.length>0}">
                   {{ship.type}}
                 </button>
               </td>
               <td class="ship-pic">
                 <div v-for="cell in ship.length" class="ship-div"></div>
               </td>
-              <td><button class="reposition" v-if="ship.locations.length>0" @click="selectedShip=ship; clearShipLocations(ship); resetShadow()">reposition</button></td>
             </tr>
           </table>
           <div id=ships-list-submit>
             <button v-if="checkIfShipsPlaced()" id="ships-submit" @click="saveShips()">Submit ship positions</button>
           </div>
         </div>
+
         <div id="ship-table-container">
           <table id="ship-placement-table">
             <tr>
@@ -70,11 +79,13 @@
           </table>
         </div>
       </div>
+      </div>
+
       <div id="game-view" v-if="gameState!='placing ships'">
         <div id="stats-container">
 
           <div id="player-stats">
-            <h3 class="underline yellow">{{gameViewData.playerUsername}}</h3>
+            <h3 class="underline">{{gameViewData.playerUsername}}</h3>
             <table class="stats">
               <tr v-for="ship in playerStats">
                 <td class="name" v-bind:class="{sunk: ship.hits==ship.length}">{{ship.type}}</td>
@@ -87,7 +98,7 @@
           </div>
 
           <div id="opponent-stats">
-            <h3 class="yellow">{{gameViewData.opponentUsername}}</h3>
+            <h3>{{gameViewData.opponentUsername}}</h3>
             <table class="stats">
               <tr v-for="ship in opponentStats">
                 <td class="name" v-bind:class="{sunk: ship.hits==ship.length}">{{ship.type}}</td>
@@ -109,13 +120,27 @@
               <div v-if="gameState =='waiting for opponent'">Waiting for opponent to join...</div>
               <div v-if="gameState =='opponent placing ships'">Opponent has joined and is preparing for battle...</div>
               <div id="shots-container" v-if="gameState=='fire salvo'">
-                <div class="yellow">Your move! Select shot locations on the grid. </div>
+                <div class="yellow">
+                  <div v-if="gameViewData.opponentSalvos.length>0">
+                  <span v-if="getOpponentTurnHits()==1">Enemy hit you 1 time.</span>
+                  <span v-else>Enemy hit you {{getOpponentTurnHits()}} times.</span>
+                  <br>
+                </div>
+                  <br>Your move!
+                  <br> Select shot locations on the grid ->
+                </div>
                 <div id="shots">
                   <div class="shot" v-for="shot in (5 - currentSalvo.locations.length)"></div>
                 </div>
                 <button v-if="checkIfSalvoComplete()" id="salvos-submit" @click="saveSalvos()">Fire salvo</button>
               </div>
-              <div v-if="gameState=='awaiting opponent salvo'" class="yellow">Waiting for enemy response... </div>
+              <div v-if="gameState=='awaiting opponent salvo'" class="yellow">
+                <span v-if="getPlayerTurnHits() > 1"> Nice! {{getPlayerTurnHits()}} hits on enemy ships.</span>
+                <span v-if="getPlayerTurnHits() == 1"> Nice! 1 hit on enemy ships.</span>
+                <span v-if="getPlayerTurnHits() == 0">No hits.</span>
+                <br>
+                <br>Waiting for counter strike...
+              </div>
               <div v-if="gameState=='opponent gets one more chance'">Congrats! You've sunk all enemy ships. They have one more chance to tie the game.</div>
               <div id="shots-container" v-if="gameState=='one more chance'">
                 <div class="yellow">All your ships have sunk! You have one more chance to tie the game. Best of luck. </div>
@@ -124,13 +149,24 @@
                 </div>
                 <button v-if="checkIfSalvoComplete()" id="salvos-submit" @click="saveSalvos()">Fire salvo</button>
               </div>
-              <div v-if="gameState=='game won'">Congratulations, you've won the battle!</div>
-              <div v-if="gameState=='game lost'">You have lost the battle.</div>
-              <div v-if="gameState=='game tied'">Well done! Game tied.</div>
+              <div v-if="gameState=='game won'">
+                Congratulations, you've won the battle!
+                <br>
+                <br><span><a class="homelink" href="games.html">Back to home</a></span>
+              </div>
+              <div v-if="gameState=='game lost'">
+                You have lost the battle.
+                <br>
+                <br><span><a class="homelink" href="games.html">Back to home</a></span>
+              </div>
+              <div v-if="gameState=='game tied'">
+                Well done! Game tied.
+                <br><span><a class="homelink" href="games.html">Back to home</a></span>
+              </div>
 
             </div>
 
-            <table id="ship-table" class="minTable">
+            <table id="ship-table">
               <tr>
                 <td class="col-label"></td>
                 <td v-for="col in cols" v-bind:class="'col-label'">{{col}}</td>
@@ -143,10 +179,11 @@
               </tr>
             </table>
 
+
           </div>
 
           <div id="col2">
-            <table id="salvo-table" class="maxTable">
+            <table id="salvo-table">
               <tr>
                 <td class="col-label"></td>
                 <td v-for="col in cols" v-bind:class="'col-label'">{{col}}</td>

@@ -32,6 +32,9 @@ public class SalvoController {
     @Autowired
     private SalvoRepository salvoRepository;
 
+    @Autowired
+    private ScoreRepository scorerepository;
+
 
     // api stuff for home page ----------------------------------------------------------
     @RequestMapping(path = "/players", method = RequestMethod.POST)
@@ -107,6 +110,8 @@ public class SalvoController {
 
     // api stuff for game view  ----------------------------------------------------------
 
+    //@RequestMapping(path = "/games/players/{gamePlayerId}/score", method = RequestMethod.POST)
+    // public ResponseEntity<Map<String,Object>> addScore(@PathVariable Long gamePlayerId, @RequestBody Score score
     @RequestMapping(path = "/games/players/{gamePlayerId}/ships", method = RequestMethod.POST)
     public ResponseEntity<Map<String,Object>> addShips(@PathVariable Long gamePlayerId,
                                            @RequestBody Set<Ship> ships,
@@ -156,6 +161,7 @@ public class SalvoController {
     @RequestMapping(path="/game_view/{id}", method=RequestMethod.GET)
     public ResponseEntity<Map<String, Object>> gameviewDTO(@PathVariable Long id, Authentication authentication) {
         GamePlayer gamePlayer = gamePlayerRepository.getOne(id);
+        Game game = gamePlayer.getGame();
         Map<String, Object> dto = new LinkedHashMap<>();
         String opponentUsername;
         List<Object> opponentSalvos;
@@ -168,10 +174,15 @@ public class SalvoController {
                 return new ResponseEntity<>(makeMap("error","User is unauthorized."), HttpStatus.UNAUTHORIZED);
             }
         }
-        dto.put("gameState",getGameState(gamePlayer));
+        String gamestate = getGameState(gamePlayer);
+        dto.put("gameState",gamestate);
+        if( (gamestate == "game won"|| gamestate == "game lost" || gamestate == "game tied")  && !checkForScores(game) ) {
+            updateScores(gamePlayer);
+            updateScores(getOpponent(gamePlayer));
+        }
         dto.put("id", gamePlayer.getId());
         dto.put("playerUsername", gamePlayer.getPlayer().getUserName());
-        dto.put("game", gameDTO(gamePlayer.getGame()));
+        dto.put("game", gameDTO(game));
         if(gamePlayer.getShips().size() != 0)
             dto.put("ships",getShips(gamePlayer));
         dto.put("playerSalvos", gamePlayer.getSalvos()
@@ -202,6 +213,28 @@ public class SalvoController {
         return new ResponseEntity<>(dto,HttpStatus.ACCEPTED);
     }
     // helper functions ----------------------------------------------------------
+
+     private boolean checkForScores(Game game){
+        Score gameScore = scorerepository.findAll()
+                .stream()
+                .filter(s -> s.getGame().getId() == game.getId())
+                .findFirst().orElse(null);
+         if(gameScore != null) return true;
+         return false;
+    }
+
+    // add updateScores() here...
+    private void updateScores(GamePlayer gameplayer) {
+        // get game
+        Game game = gameplayer.getGame();
+        // get player
+        Player player = gameplayer.getPlayer();
+        // get score
+        double score = 0;
+        if(getGameState(gameplayer) == "game won") score = 1;
+        if(getGameState(gameplayer) == "game tied") score = 0.5;
+        scorerepository.save(new Score(game, player, score));
+    }
 
     private Integer getTurn(GamePlayer gameplayer) {
         Set <Salvo> playerSalvos = gameplayer.getSalvos();
@@ -418,6 +451,12 @@ public class SalvoController {
         dto.put("id", gameplayer.getId());
         dto.put("score", scoreDTO(gameplayer.getScore()));
         dto.put("player", playerDTO(gameplayer.getPlayer()));
+        // put hasShips here?
+        if(gameplayer.getShips().size()>0){
+            dto.put("placedShips", "true");
+        } else {
+            dto.put("placedShips", "false");
+        }
         return dto;
     }
 

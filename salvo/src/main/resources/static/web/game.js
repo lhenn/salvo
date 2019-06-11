@@ -4,13 +4,14 @@ const app = new Vue({
     gp: window.location.search.split('=')[1] || null,
     gameViewData: {},
     gameState: "",
+    playerTurnFeedback:"test-says what player just did",
+    opponentTurnFeedback:"test-says what opp just did",
     shipLocations: [],
     playerSalvos: [],
     opponentSalvos: [],
     cols: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
     rows: ["A", "B", "C", "D", "E", "F", "G", "H", "I", "J"],
     error: "",
-    shipsPlaced: false,
     ships: [{
         "type": "Aircraft Carrier",
         "locations": [],
@@ -81,23 +82,24 @@ const app = new Vue({
           this.playerStats = this.getShipStats('player');
           this.opponentStats = this.getShipStats('opponent');
         }
-        console.log(app.gameViewData);
-        console.log("gameState: ", this.gameState);
       } else {
         this.error = 'Sorry something went wrong -- please find your game through our home page.'
       }
     },
-    getGameState: async function() {
-      let json = await fetch('/api/game_state/' + this.gp,{
-        method: "GET"
-      })
-      .then(function(response) {
-        return response.json();
-      })
-      .then((json) => json)
-      .catch(function(error) {
-        console.error(error);
-      })
+    logout: function() {
+      fetch('/api/logout', {
+          method: 'POST',
+          credentials: 'include',
+          headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'Accept': 'application/json'
+          }
+        })
+        .then(function(json) {
+          console.log(json);
+          window.location.replace("/web/games.html")
+        })
+        .catch(error => console.log(error))
     },
     saveShips: async function() {
       let json = await fetch('/api/games/players/' + this.gp + '/ships', {
@@ -260,6 +262,13 @@ const app = new Vue({
         else this.shipShadow.push(String.fromCharCode(thresholdRow + i) + col);
       }
     },
+    selectShip: function(ship) {
+      if(this.selectedShip != ship) this.selectedShip = ship;
+      else {
+        this.clearShipLocations(ship);
+        this.resetShadow();
+      }
+    },
     placeShip: function() {
       if (!this.illegalPlacement) {
         for (let i = 0; i < this.ships.length; i++) {
@@ -337,8 +346,11 @@ const app = new Vue({
       if (!this.illegalPlacement) {
         if (this.currentSalvo.locations.length <= 5) {
           if (this.currentSalvo.locations.includes(cellName)) {
-            let index = this.currentSalvo.locations.indexOf('cellName');
+            console.log("current salvo locations: ", this.currentSalvo.locations)
+            let index = this.currentSalvo.locations.indexOf(cellName);
+            console.log("index: ", index);
             this.currentSalvo.locations.splice(index, 1);
+            console.log("after splice: ", this.currentSalvo.locations)
           } else {
             this.currentSalvo.locations.push(this.salvoShadow[0]);
           }
@@ -368,9 +380,38 @@ const app = new Vue({
       if(player == 'player') hits = this.gameViewData.playerHits;
       if(player == 'opponent') hits = this.gameViewData.opponentHits;
       for(let i=0; i<hits.length; i++) {
-        if( hits[i].type == shipType ) count = count + 1;
+        if( hits[i].type == shipType ) count += 1;
       }
       return count;
+    },
+    getOpponentTurnHits: function() {
+      turnHits = 0
+      if(this.gameViewData.opponentSalvos.length > 0) {
+        let lastTurn = Math.max(...this.gameViewData.opponentSalvos.map(s =>s.turn));
+        let lastSalvo = this.gameViewData.opponentSalvos.find(function(salvo) {
+          return salvo.turn == lastTurn;
+        });
+        for(let i = 0; i<lastSalvo.locations.length; i++){
+          if(this.gameViewData.playerHits.map(h => h.location).includes(lastSalvo.locations[i]))
+            turnHits+=1;
+        }
+      }
+      console.log("opponent turn hits: ", turnHits);
+      return turnHits;
+    },
+    getPlayerTurnHits: function() {
+      turnHits = 0;
+      if(this.gameViewData.playerSalvos.length > 0) {
+        let lastTurn = Math.max(...this.gameViewData.playerSalvos.map(s =>s.turn));
+        let lastSalvo = this.gameViewData.playerSalvos.find(function(salvo) {
+          return salvo.turn == lastTurn;
+        });
+        for(let i = 0; i<lastSalvo.locations.length; i++){
+          if(this.gameViewData.opponentHits.map(h => h.location).includes(lastSalvo.locations[i]))
+            turnHits+=1;
+        }
+      }
+      return turnHits;
     }
   }
 })
