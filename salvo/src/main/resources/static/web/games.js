@@ -44,7 +44,6 @@ const app = new Vue({
           } else {
             app.loggedIn= false;
           }
-          console.log(json);
         })
         .catch(function(error) {
           console.log(error);
@@ -78,7 +77,6 @@ const app = new Vue({
         })
         .then(function(json) {
           if (json.ok) {
-            console.log(json);
             app.getGamesData();
           } else if (!json.ok && app.username == "" && app.password == "") {
             app.error = "blank";
@@ -87,7 +85,6 @@ const app = new Vue({
           }
         })
         .catch(function(error) {
-          console.log(error);
           app.error = 'error';
         })
     },
@@ -101,7 +98,6 @@ const app = new Vue({
           }
         })
         .then(function(json) {
-          console.log(json);
           location.reload();
         })
         .catch(error => console.log(error))
@@ -141,7 +137,6 @@ const app = new Vue({
         .catch(function(error) {
           console.error(error);
         })
-      console.log(json)
       window.location.replace("game.html?gp=" + json.gp);
       if (json.error) this.error = "You are not authorized to see this page."
     },
@@ -161,7 +156,6 @@ const app = new Vue({
         .catch(function(error) {
           console.log(error);
         })
-      console.log(json);
       if(json.error) this.error = json.error;
       window.location.replace("game.html?gp=" + json.gp);
     },

@@ -96,7 +96,6 @@ const app = new Vue({
           }
         })
         .then(function(json) {
-          console.log(json);
           window.location.replace("/web/games.html")
         })
         .catch(error => console.log(error))
@@ -117,7 +116,6 @@ const app = new Vue({
         .catch(function(error) {
           console.log(error);
         })
-      console.log(json);
       if (!json.error) this.getData()
     },
     saveSalvos: async function() {
@@ -136,7 +134,6 @@ const app = new Vue({
         .catch(function(error) {
           console.log(error);
         })
-      console.log(json);
       if (!json.error) {
         this.currentSalvo.locations = [];
         this.getData()
@@ -290,7 +287,6 @@ const app = new Vue({
         row = this.shipShadow[0].substring(0, 1);
         col = parseInt(this.shipShadow[0].substring(1, 2));
         this.getShadowLocation(row, col);
-        console.log(row, col);
       }
     },
     resetShadowOrientation: function() {
@@ -346,11 +342,8 @@ const app = new Vue({
       if (!this.illegalPlacement) {
         if (this.currentSalvo.locations.length <= 5) {
           if (this.currentSalvo.locations.includes(cellName)) {
-            console.log("current salvo locations: ", this.currentSalvo.locations)
             let index = this.currentSalvo.locations.indexOf(cellName);
-            console.log("index: ", index);
             this.currentSalvo.locations.splice(index, 1);
-            console.log("after splice: ", this.currentSalvo.locations)
           } else {
             this.currentSalvo.locations.push(this.salvoShadow[0]);
           }
@@ -396,7 +389,6 @@ const app = new Vue({
             turnHits+=1;
         }
       }
-      console.log("opponent turn hits: ", turnHits);
       return turnHits;
     },
     getPlayerTurnHits: function() {
