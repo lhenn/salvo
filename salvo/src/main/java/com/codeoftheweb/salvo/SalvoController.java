@@ -170,7 +170,6 @@ public class SalvoController {
         if (authentication != null) {
             dto.put("logged-player", playerDTO(getLoggedPlayer(authentication)));
             if(gamePlayer.getPlayer().getId() != getLoggedPlayer(authentication).getId()){
-                System.out.println("here's the problem");
                 return new ResponseEntity<>(makeMap("error","User is unauthorized."), HttpStatus.UNAUTHORIZED);
             }
         }
@@ -294,7 +293,6 @@ public class SalvoController {
 
 
     private List<String> getShots(GamePlayer gameplayer) {
-        System.out.println(gameplayer);
         ArrayList<String> shots = new ArrayList<>();
         Set<Salvo> salvos = gameplayer.getSalvos();
         for (Salvo salvo : salvos) {
